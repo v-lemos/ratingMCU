@@ -12,26 +12,29 @@
 }
 
 .auth-modal {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 8px;
   padding: 24px;
   max-width: 320px;
   width: 90%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px var(--shadow);
   text-align: center;
+  transition: background-color 0.3s ease;
 }
 
 .auth-modal h2 {
   margin: 0 0 8px 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 20px;
   font-weight: 600;
+  transition: color 0.3s ease;
 }
 
 .auth-modal p {
   margin: 0 0 20px 0;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 14px;
+  transition: color 0.3s ease;
 }
 
 .login-form {
@@ -46,33 +49,37 @@
   display: block;
   margin-bottom: 6px;
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary);
   font-size: 14px;
+  transition: color 0.3s ease;
 }
 
 .password-input {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--input-border);
   border-radius: 4px;
   font-size: 14px;
-  transition: border-color 0.2s ease;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  transition: border-color 0.2s ease, background-color 0.3s ease, color 0.3s ease;
   box-sizing: border-box;
 }
 
 .password-input:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--border-hover);
 }
 
 .error-message {
-  background: #fee;
-  color: #c33;
+  background: var(--error-bg);
+  color: var(--error-text);
   padding: 8px;
   border-radius: 4px;
   margin-bottom: 12px;
   font-size: 13px;
   text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .button-group {
@@ -94,22 +101,22 @@
 }
 
 .login-btn {
-  background: #007bff;
+  background: var(--button-primary);
   color: white;
 }
 
 .login-btn:hover {
-  background: #0056b3;
+  background: var(--button-primary-hover);
 }
 
 .guest-btn {
-  background: #f8f9fa;
-  color: #495057;
-  border: 1px solid #dee2e6;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
 }
 
 .guest-btn:hover {
-  background: #e9ecef;
+  background: var(--border-color);
 }
 
 .login-btn:disabled,

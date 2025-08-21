@@ -7,77 +7,103 @@
 
 .header-section {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 }
 
 .mcu-rankings h1 {
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 10px;
+  transition: color 0.3s ease;
 }
 
 .mcu-rankings p {
-  color: #666;
+  color: var(--text-secondary);
   margin-bottom: 15px;
+  transition: color 0.3s ease;
+}
+
+.phase-section {
+  margin-bottom: 40px;
+}
+
+.phase-title {
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  padding-bottom: 8px;
+  border-bottom: 3px solid var(--border-hover);
+  display: inline-block;
+  transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 
 
 .score-display {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   padding: 8px 12px;
-  background: #f8f9fa;
+  background: var(--bg-primary);
   border-radius: 4px;
   display: inline-block;
   min-width: 40px;
   text-align: center;
+  transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 .loading {
   text-align: center;
   padding: 50px;
   font-size: 18px;
-  color: #666;
+  color: var(--text-secondary);
+  transition: color 0.3s ease;
 }
 
 .table-container {
   overflow-x: auto;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px var(--shadow);
   border-radius: 8px;
+  transition: box-shadow 0.3s ease;
 }
 
 .rankings-table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
+  background: var(--bg-secondary);
+  transition: background-color 0.3s ease;
 }
 
 .rankings-table th {
-  background: #f8f9fa;
+  background: var(--bg-primary);
   padding: 15px;
   text-align: left;
   font-weight: 600;
-  color: #333;
-  border-bottom: 2px solid #dee2e6;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-color);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 .rankings-table td {
   padding: 12px 15px;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--border-color);
+  transition: border-color 0.3s ease;
 }
 
 .rankings-table tr:hover {
-  background-color: #f8f9fa;
+  background-color: var(--bg-primary);
+  transition: background-color 0.2s ease;
 }
 
 .film-title {
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary);
+  transition: color 0.3s ease;
 }
 
 .film-year {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 14px;
+  transition: color 0.3s ease;
 }
 
 .score-cell {
@@ -86,24 +112,25 @@
 
 .score-select {
   padding: 8px 12px;
-  border: 2px solid #dee2e6;
+  border: 2px solid var(--border-color);
   border-radius: 4px;
-  background: white;
+  background: var(--input-bg);
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.3s ease, color 0.3s ease;
   min-width: 70px;
 }
 
 .score-select:hover {
-  border-color: #007bff;
+  border-color: var(--border-hover);
 }
 
 .score-select:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  border-color: var(--border-hover);
+  box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.1);
 }
 
 /* Responsive design */

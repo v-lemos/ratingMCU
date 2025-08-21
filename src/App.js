@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
+import { ThemeProvider } from './ThemeContext';
 import './App.css';
 import MCURankings from './MCURankings';
 import AuthModal from './AuthModal';
+import ThemeToggle from './ThemeToggle';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -73,26 +75,29 @@ function App() {
   }
 
   return (
-    <div className={`App ${isReadOnly ? 'guest-mode' : ''}`}>
-      <div className={`main-content ${showAuthModal ? 'blurred' : ''}`}>
-        {user && (
-          <div className="user-header">
-            <span>Logged in as Admin</span>
-            <button onClick={handleSignOut} className="sign-out-btn">
-              Sign Out
-            </button>
-          </div>
+    <ThemeProvider>
+      <div className={`App ${isReadOnly ? 'guest-mode' : ''}`}>
+        <ThemeToggle />
+        <div className={`main-content ${showAuthModal ? 'blurred' : ''}`}>
+          {user && (
+            <div className="user-header">
+              <span>Logged in as Admin</span>
+              <button onClick={handleSignOut} className="sign-out-btn">
+                Sign Out
+              </button>
+            </div>
+          )}
+          <MCURankings isReadOnly={isReadOnly} />
+        </div>
+        
+        {showAuthModal && (
+          <AuthModal 
+            onLogin={handleLogin}
+            onGuestMode={handleGuestMode}
+          />
         )}
-        <MCURankings isReadOnly={isReadOnly} />
       </div>
-      
-      {showAuthModal && (
-        <AuthModal 
-          onLogin={handleLogin}
-          onGuestMode={handleGuestMode}
-        />
-      )}
-    </div>
+    </ThemeProvider>
   );
 }
 

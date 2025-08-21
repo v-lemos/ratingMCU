@@ -1,11 +1,52 @@
+/* Light theme variables */
+.light-theme {
+  --bg-primary: #f5f5f5;
+  --bg-secondary: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --border-color: #dee2e6;
+  --border-hover: #007bff;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --input-bg: #ffffff;
+  --input-border: #ddd;
+  --button-primary: #007bff;
+  --button-primary-hover: #0056b3;
+  --button-secondary: #6c757d;
+  --button-secondary-hover: #545b62;
+  --error-bg: #fee;
+  --error-text: #c33;
+  --guest-border: #007bff;
+}
+
+/* Dark theme variables */
+.dark-theme {
+  --bg-primary: #1a202c;
+  --bg-secondary: #2d3748;
+  --text-primary: #e2e8f0;
+  --text-secondary: #a0aec0;
+  --border-color: #4a5568;
+  --border-hover: #63b3ed;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --input-bg: #2d3748;
+  --input-border: #4a5568;
+  --button-primary: #3182ce;
+  --button-primary-hover: #2c5282;
+  --button-secondary: #4a5568;
+  --button-secondary-hover: #2d3748;
+  --error-bg: #fed7d7;
+  --error-text: #c53030;
+  --guest-border: #63b3ed;
+}
+
 .App {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--bg-primary);
   padding: 20px 0;
+  transition: background-color 0.3s ease;
 }
 
 .App.guest-mode {
-  border: 4px solid #007bff;
+  border: 4px solid var(--guest-border);
   box-sizing: border-box;
 }
 
@@ -24,14 +65,14 @@
   align-items: center;
   justify-content: center;
   min-height: 50vh;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #007bff;
+  border: 4px solid var(--border-color);
+  border-top: 4px solid var(--button-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 20px;
@@ -49,13 +90,14 @@
   max-width: 800px;
   margin: 0 auto 20px auto;
   padding: 15px 20px;
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px var(--shadow);
+  transition: background-color 0.3s ease;
 }
 
 .user-header span {
-  color: #333;
+  color: var(--text-primary);
   font-weight: 500;
 }
 
