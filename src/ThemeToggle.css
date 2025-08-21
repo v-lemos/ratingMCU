@@ -1,7 +1,4 @@
 .theme-toggle {
-  position: fixed;
-  top: 20px;
-  right: 20px;
   background: var(--toggle-bg);
   border: 2px solid var(--toggle-border);
   border-radius: 50%;
@@ -12,8 +9,15 @@
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  z-index: 100;
   box-shadow: 0 2px 8px var(--toggle-shadow);
+}
+
+/* When not inside header, use fixed positioning */
+.theme-toggle:not(.header .theme-toggle) {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
 }
 
 .theme-toggle:hover {

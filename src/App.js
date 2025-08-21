@@ -4,7 +4,8 @@ import { ThemeProvider } from './ThemeContext';
 import './App.css';
 import MCURankings from './MCURankings';
 import AuthModal from './AuthModal';
-import ThemeToggle from './ThemeToggle';
+import Header from './Header';
+import Footer from './Footer';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -77,8 +78,8 @@ function App() {
   return (
     <ThemeProvider>
       <div className={`App ${isReadOnly ? 'guest-mode' : ''}`}>
-        <ThemeToggle />
         <div className={`main-content ${showAuthModal ? 'blurred' : ''}`}>
+          <Header />
           {user && (
             <div className="user-header">
               <span>Logged in as Admin</span>
@@ -88,6 +89,7 @@ function App() {
             </div>
           )}
           <MCURankings isReadOnly={isReadOnly} />
+          <Footer />
         </div>
         
         {showAuthModal && (
