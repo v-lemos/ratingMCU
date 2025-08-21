@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import './MCURankings.css';
 
-const MCURankings = () => {
+const MCURankings = ({ isReadOnly = false }) => {
   const [rankings, setRankings] = useState([]);
   const [films, setFilms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -154,8 +154,16 @@ const MCURankings = () => {
 
   return (
     <div className="mcu-rankings">
-      <h1>MCU Infinity Saga Rankings</h1>
-      <p>Rate each film from 0 to 10 (with +/- modifiers for 1-9)</p>
+      <div className="header-section">
+        <h1>MCU Infinity Saga Rankings</h1>
+        <p>
+          {isReadOnly 
+            ? "Viewing rankings in guest mode" 
+            : "Rate each film from 0 to 10 (with +/- modifiers for 1-9)"
+          }
+        </p>
+
+      </div>
       
       <div className="table-container">
         <table className="rankings-table">
@@ -163,7 +171,7 @@ const MCURankings = () => {
             <tr>
               <th>Film</th>
               <th>Year</th>
-              <th>Your Rating</th>
+              <th>{isReadOnly ? 'Rating' : 'Your Rating'}</th>
             </tr>
           </thead>
           <tbody>
@@ -172,17 +180,21 @@ const MCURankings = () => {
                 <td className="film-title">{ranking.title}</td>
                 <td className="film-year">{ranking.year}</td>
                 <td className="score-cell">
-                  <select
-                    value={ranking.score}
-                    onChange={(e) => updateScore(ranking.film_id, e.target.value)}
-                    className="score-select"
-                  >
-                    {scoreOptions.map(option => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
+                  {isReadOnly ? (
+                    <span className="score-display">{ranking.score}</span>
+                  ) : (
+                    <select
+                      value={ranking.score}
+                      onChange={(e) => updateScore(ranking.film_id, e.target.value)}
+                      className="score-select"
+                    >
+                      {scoreOptions.map(option => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </td>
               </tr>
             ))}
