@@ -4,34 +4,8 @@ import './MCURankings.css';
 
 const MCURankings = () => {
   const [rankings, setRankings] = useState([]);
+  const [films, setFilms] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // MCU Infinity Saga films (up to Far From Home)
-  const mcuFilms = [
-    { id: 1, title: 'Iron Man', year: 2008 },
-    { id: 2, title: 'The Incredible Hulk', year: 2008 },
-    { id: 3, title: 'Iron Man 2', year: 2010 },
-    { id: 4, title: 'Thor', year: 2011 },
-    { id: 5, title: 'Captain America: The First Avenger', year: 2011 },
-    { id: 6, title: 'The Avengers', year: 2012 },
-    { id: 7, title: 'Iron Man 3', year: 2013 },
-    { id: 8, title: 'Thor: The Dark World', year: 2013 },
-    { id: 9, title: 'Captain America: The Winter Soldier', year: 2014 },
-    { id: 10, title: 'Guardians of the Galaxy', year: 2014 },
-    { id: 11, title: 'Avengers: Age of Ultron', year: 2015 },
-    { id: 12, title: 'Ant-Man', year: 2015 },
-    { id: 13, title: 'Captain America: Civil War', year: 2016 },
-    { id: 14, title: 'Doctor Strange', year: 2016 },
-    { id: 15, title: 'Guardians of the Galaxy Vol. 2', year: 2017 },
-    { id: 16, title: 'Spider-Man: Homecoming', year: 2017 },
-    { id: 17, title: 'Thor: Ragnarok', year: 2017 },
-    { id: 18, title: 'Black Panther', year: 2018 },
-    { id: 19, title: 'Avengers: Infinity War', year: 2018 },
-    { id: 20, title: 'Ant-Man and the Wasp', year: 2018 },
-    { id: 21, title: 'Captain Marvel', year: 2019 },
-    { id: 22, title: 'Avengers: Endgame', year: 2019 },
-    { id: 23, title: 'Spider-Man: Far From Home', year: 2019 }
-  ];
 
   // Generate score options (0, 1-, 1, 1+, 2-, 2, 2+, ..., 9-, 9, 9+, 10)
   const generateScoreOptions = () => {
@@ -46,28 +20,66 @@ const MCURankings = () => {
   const scoreOptions = generateScoreOptions();
 
   useEffect(() => {
-    // Test Supabase connection
-    const testConnection = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('mcu_rankings')
-          .select('count', { count: 'exact', head: true });
-        
-        if (error) {
-          console.error('Connection test failed:', error);
-        } else {
-          console.log('Supabase connection successful, table exists');
-        }
-      } catch (err) {
-        console.error('Connection test error:', err);
-      }
-    };
-    
-    testConnection();
-    fetchRankings();
+    fetchData();
   }, []);
 
-  const fetchRankings = async () => {
+  const fetchData = async () => {
+    try {
+      // First fetch films from database
+      await fetchFilms();
+    } catch (error) {
+      console.error('Error in fetchData:', error);
+      setLoading(false);
+    }
+  };
+
+  const fetchFilms = async () => {
+    try {
+      const { data: filmsData, error: filmsError } = await supabase
+        .from('mcu_films')
+        .select('*')
+        .order('id');
+
+      if (filmsError) throw filmsError;
+
+      setFilms(filmsData || []);
+      
+      // After films are loaded, fetch rankings
+      await fetchRankings(filmsData || []);
+    } catch (error) {
+      console.error('Error fetching films:', error);
+      // Fallback to hardcoded films if database table doesn't exist
+      const fallbackFilms = [
+        { id: 1, title: 'Iron Man', year: 2008 },
+        { id: 2, title: 'The Incredible Hulk', year: 2008 },
+        { id: 3, title: 'Iron Man 2', year: 2010 },
+        { id: 4, title: 'Thor', year: 2011 },
+        { id: 5, title: 'Captain America: The First Avenger', year: 2011 },
+        { id: 6, title: 'The Avengers', year: 2012 },
+        { id: 7, title: 'Iron Man 3', year: 2013 },
+        { id: 8, title: 'Thor: The Dark World', year: 2013 },
+        { id: 9, title: 'Captain America: The Winter Soldier', year: 2014 },
+        { id: 10, title: 'Guardians of the Galaxy', year: 2014 },
+        { id: 11, title: 'Avengers: Age of Ultron', year: 2015 },
+        { id: 12, title: 'Ant-Man', year: 2015 },
+        { id: 13, title: 'Captain America: Civil War', year: 2016 },
+        { id: 14, title: 'Doctor Strange', year: 2016 },
+        { id: 15, title: 'Guardians of the Galaxy Vol. 2', year: 2017 },
+        { id: 16, title: 'Spider-Man: Homecoming', year: 2017 },
+        { id: 17, title: 'Thor: Ragnarok', year: 2017 },
+        { id: 18, title: 'Black Panther', year: 2018 },
+        { id: 19, title: 'Avengers: Infinity War', year: 2018 },
+        { id: 20, title: 'Ant-Man and the Wasp', year: 2018 },
+        { id: 21, title: 'Captain Marvel', year: 2019 },
+        { id: 22, title: 'Avengers: Endgame', year: 2019 },
+        { id: 23, title: 'Spider-Man: Far From Home', year: 2019 }
+      ];
+      setFilms(fallbackFilms);
+      await fetchRankings(fallbackFilms);
+    }
+  };
+
+  const fetchRankings = async (filmsData) => {
     try {
       const { data, error } = await supabase
         .from('mcu_rankings')
@@ -77,7 +89,7 @@ const MCURankings = () => {
       if (error) throw error;
 
       // Initialize rankings with existing data or default values
-      const initialRankings = mcuFilms.map(film => {
+      const initialRankings = filmsData.map(film => {
         const existingRanking = data?.find(r => r.film_id === film.id);
         return {
           film_id: film.id,
@@ -91,7 +103,7 @@ const MCURankings = () => {
     } catch (error) {
       console.error('Error fetching rankings:', error);
       // Initialize with default values if table doesn't exist yet
-      const defaultRankings = mcuFilms.map(film => ({
+      const defaultRankings = filmsData.map(film => ({
         film_id: film.id,
         title: film.title,
         year: film.year,
