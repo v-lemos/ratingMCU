@@ -196,16 +196,6 @@ const MCURankings = ({ isReadOnly = false }) => {
 
   return (
     <div className="mcu-rankings">
-      <div className="header-section">
-        <h1>MCU Infinity Saga Rankings</h1>
-        <p>
-          {isReadOnly 
-            ? "Viewing rankings in guest mode" 
-            : "Rate each film from 0 to 10 (with +/- modifiers for 1-9)"
-          }
-        </p>
-      </div>
-      
       {sortedPhases.map(phaseNumber => (
         <div key={phaseNumber} className="phase-section">
           <h2 className="phase-title">Phase {phaseNumber}</h2>

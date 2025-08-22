@@ -9,7 +9,7 @@ const AuthModal = ({ onLogin, onGuestMode }) => {
 
   // Predefined admin credentials
   const ADMIN_EMAIL = 'admin@mcurankings.local';
-  const ADMIN_PASSWORD = 'mcu2024admin';
+  const ADMIN_PASSWORD = '';
 
   const handleAuth = async (e) => {
     e.preventDefault();
