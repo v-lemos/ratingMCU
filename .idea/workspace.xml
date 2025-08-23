@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6a02c87b-9d9a-47de-a9b6-8ebe4c241e0f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/AuthModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/AuthModal.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MCURankings.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/MCURankings.js" afterDir="false" />
-    </list>
+    <list default="true" id="6a02c87b-9d9a-47de-a9b6-8ebe4c241e0f" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -72,6 +67,7 @@
       <workItem from="1755811076199" duration="657000" />
       <workItem from="1755811755995" duration="6216000" />
       <workItem from="1755884202957" duration="1878000" />
+      <workItem from="1755886574510" duration="165000" />
     </task>
     <servers />
   </component>

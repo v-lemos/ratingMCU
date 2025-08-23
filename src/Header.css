@@ -25,6 +25,22 @@
   transition: color 0.3s ease;
 }
 
+/* Colored parts of the title */
+.title-rating-the {
+  color: #ffcc00; /* yellow */
+}
+
+.title-mcu {
+  color: #b22222; /* dark red */
+}
+
+/* Actions container (theme switch + sign out) */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 /* Override the fixed positioning of ThemeToggle when it's in the header */
 .header .theme-toggle {
   position: static;

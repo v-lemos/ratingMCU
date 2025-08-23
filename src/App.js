@@ -79,15 +79,7 @@ function App() {
     <ThemeProvider>
       <div className={`App ${isReadOnly ? 'guest-mode' : ''}`}>
         <div className={`main-content ${showAuthModal ? 'blurred' : ''}`}>
-          <Header />
-          {user && (
-            <div className="user-header">
-              <span>Logged in as Admin</span>
-              <button onClick={handleSignOut} className="sign-out-btn">
-                Sign Out
-              </button>
-            </div>
-          )}
+          <Header user={user} onSignOut={handleSignOut} />
           <MCURankings isReadOnly={isReadOnly} />
           <Footer />
         </div>
