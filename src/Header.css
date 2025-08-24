@@ -72,3 +72,37 @@
     font-size: 16px;
   }
 }
+
+/* Make Sign Out button match ThemeToggle appearance */
+.sign-out-btn {
+  background: var(--toggle-bg);
+  border: 2px solid var(--toggle-border);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px var(--toggle-shadow);
+  padding: 0;
+  line-height: 1;
+  font-size: 0; /* visually hide original text */
+}
+
+.sign-out-btn::before {
+  content: '🚪';
+  font-size: 20px;
+}
+
+.sign-out-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px var(--toggle-shadow);
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .sign-out-btn { width: 45px; height: 45px; }
+  .sign-out-btn::before { font-size: 18px; }
+}

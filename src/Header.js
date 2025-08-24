@@ -7,7 +7,7 @@ const Header = ({ user, onSignOut }) => {
     <header className="header">
       <div className="header-content">
         <h1 className="header-title">
-          <span className="title-rating-the">Rating The</span> <span className="title-mcu">MCU</span>
+          <span className="title-rating-the">RATING THE</span> <span className="title-mcu">MCU</span>
         </h1>
         <div className="header-actions">
           <ThemeToggle />
