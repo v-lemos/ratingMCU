@@ -4,8 +4,8 @@ import { useTheme } from './ThemeContext';
 import './MCURankings.css';
 
 const MCURankings = ({ isReadOnly = false }) => {
+  const [items, setItems] = useState([]);
   const [rankings, setRankings] = useState([]);
-  const [films, setFilms] = useState([]);
   const [scoreColors, setScoreColors] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,9 +30,8 @@ const MCURankings = ({ isReadOnly = false }) => {
   const fetchData = async () => {
     try {
       setError(null);
-      // First fetch score colors, then films
       await fetchScoreColors();
-      await fetchFilms();
+      await fetchItems();
     } catch (error) {
       console.error('Error in fetchData:', error);
       setError('Failed to load data from Supabase');
@@ -47,7 +46,6 @@ const MCURankings = ({ isReadOnly = false }) => {
 
     if (colorsError) throw colorsError;
 
-    // Convert array to object for easy lookup
     const colorsMap = {};
     colorsData?.forEach(colorData => {
       colorsMap[colorData.score] = {
@@ -60,122 +58,110 @@ const MCURankings = ({ isReadOnly = false }) => {
     setScoreColors(colorsMap);
   };
 
-  const fetchFilms = async () => {
-    const { data: filmsData, error: filmsError } = await supabase
-      .from('mcu_films')
+  const fetchItems = async () => {
+    const { data: itemsData, error: itemsError } = await supabase
+      .from('mcu_items')
       .select('*')
       .order('phase, phase_order');
 
-    if (filmsError) throw filmsError;
+    if (itemsError) throw itemsError;
 
-    setFilms(filmsData || []);
-    
-    // After films are loaded, fetch rankings
-    await fetchRankings(filmsData || []);
+    setItems(itemsData || []);
+    await fetchItemRankings(itemsData || []);
   };
 
-  const fetchRankings = async (filmsData) => {
+  const fetchItemRankings = async (itemsData) => {
     try {
       const { data, error } = await supabase
-        .from('mcu_rankings')
+        .from('mcu_item_rankings')
         .select('*')
-        .order('film_id');
+        .order('item_id');
 
       if (error) throw error;
 
-      // Initialize rankings with existing data or default values
-      const initialRankings = filmsData.map(film => {
-        const existingRanking = data?.find(r => r.film_id === film.id);
-        return {
-          film_id: film.id,
-          title: film.title,
-          year: film.year,
-          phase: film.phase,
-          phase_order: film.phase_order,
-          score: existingRanking?.score || '5'
-        };
-      });
+      const byId = new Map(data?.map(r => [r.item_id, r]) || []);
 
-      setRankings(initialRankings);
+      const merged = itemsData.map(it => ({
+        ...it,
+        score: byId.get(it.id)?.score || '5'
+      }));
+
+      setRankings(merged);
     } catch (error) {
-      console.error('Error fetching rankings:', error);
-      throw error; // Re-throw to be caught by fetchData
+      console.error('Error fetching item rankings:', error);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  // Group rankings by phase
-  const groupRankingsByPhase = () => {
+  // Group by phase
+  const groupByPhase = (list) => {
     const phases = {};
-    rankings.forEach(ranking => {
-      const phase = ranking.phase || 1; // fallback for old data
-      if (!phases[phase]) {
-        phases[phase] = [];
-      }
-      phases[phase].push(ranking);
+    list.forEach(item => {
+      const phase = item.phase || 1;
+      if (!phases[phase]) phases[phase] = [];
+      phases[phase].push(item);
     });
     return phases;
   };
 
-  // Get color for a score based on current theme
+  // Build a map of show_key -> season count to decide when to show season number
+  const getShowCounts = (list) => {
+    const counts = new Map();
+    for (const item of list) {
+      if (item.item_type === 'show' && item.show_key) {
+        counts.set(item.show_key, (counts.get(item.show_key) || 0) + 1);
+      }
+    }
+    return counts;
+  };
+
+  const getDisplayTitle = (item, showCounts) => {
+    if (item.item_type === 'show' && item.season_number) {
+      const count = showCounts.get(item.show_key) || 0;
+      // Only show season number if show has multiple seasons
+      return count > 1 ? `${item.title} — S${item.season_number}` : item.title;
+    }
+    return item.title;
+  };
+
+  // Colors
   const getScoreColor = (score) => {
     const colorData = scoreColors[score];
-    if (!colorData) return isDarkMode ? '#4A5568' : '#F8F9FA'; // fallback to white/gray
+    if (!colorData) return isDarkMode ? '#4A5568' : '#F8F9FA';
     return isDarkMode ? colorData.dark : colorData.light;
   };
 
-  // Get text color for score (ensure readability)
   const getScoreTextColor = (score) => {
     const colorData = scoreColors[score];
     if (!colorData) return isDarkMode ? '#E2E8F0' : '#333333';
-    
-    // For white/light colors, use dark text in light mode, light text in dark mode
-    if (colorData.name === 'white') {
-      return isDarkMode ? '#E2E8F0' : '#333333';
-    }
-    
-    // For yellow, use dark text in both modes for better readability
-    if (colorData.name === 'yellow') {
-      return '#1A202C';
-    }
-    
-    // For all other colors, use white text
+    if (colorData.name === 'white') return isDarkMode ? '#E2E8F0' : '#333333';
+    if (colorData.name === 'yellow') return '#1A202C';
     return '#FFFFFF';
   };
 
-  const updateScore = async (filmId, newScore) => {
+  const updateScore = async (item, newScore) => {
     try {
-      console.log('Attempting to update:', { filmId, newScore });
-      
-      const { data, error } = await supabase
-        .from('mcu_rankings')
+      const { error } = await supabase
+        .from('mcu_item_rankings')
         .upsert({
-          film_id: filmId,
+          item_id: item.id,
           score: newScore,
           updated_at: new Date().toISOString()
         }, {
-          onConflict: 'film_id'
+          onConflict: 'item_id'
         });
-
-      if (error) {
-        console.error('Supabase error details:', error);
-        throw error;
-      }
-
-      console.log('Update successful:', data);
-
-      // Update local state
-      setRankings(prev => prev.map(ranking => 
-        ranking.film_id === filmId 
-          ? { ...ranking, score: newScore }
-          : ranking
-      ));
+      if (error) throw error;
+      setRankings(prev => prev.map(r => r.id === item.id ? { ...r, score: newScore } : r));
     } catch (error) {
       console.error('Error updating score:', error);
       alert(`Failed to update score: ${error.message || 'Unknown error'}`);
     }
   };
+
+  const phases = groupByPhase(rankings);
+  const allPhaseNumbers = Object.keys(phases).map(n => parseInt(n, 10)).sort((a, b) => a - b);
 
   if (loading) {
     return <div className="loading">Loading your MCU rankings...</div>;
@@ -191,65 +177,66 @@ const MCURankings = ({ isReadOnly = false }) => {
     );
   }
 
-  const phasesByNumber = groupRankingsByPhase();
-  const sortedPhases = Object.keys(phasesByNumber).sort((a, b) => parseInt(a) - parseInt(b));
-
   return (
     <div className="mcu-rankings">
-      {sortedPhases.map(phaseNumber => (
-        <div key={phaseNumber} className="phase-section">
-          <h2 className="phase-title">Phase {phaseNumber}</h2>
-          <div className="table-container">
-            <table className="rankings-table">
-              <tbody>
-                {phasesByNumber[phaseNumber].map(ranking => (
-                  <tr key={ranking.film_id}>
-                    <td className="film-title">{ranking.title}</td>
-                    <td className="film-year">{ranking.year}</td>
-                    <td className="score-cell">
-                      {isReadOnly ? (
-                        <span 
-                          className="score-display"
-                          style={{
-                            backgroundColor: getScoreColor(ranking.score),
-                            color: getScoreTextColor(ranking.score)
-                          }}
-                        >
-                          {ranking.score}
-                        </span>
-                      ) : (
-                        <select
-                          value={ranking.score}
-                          onChange={(e) => updateScore(ranking.film_id, e.target.value)}
-                          className="score-select"
-                          style={{
-                            backgroundColor: getScoreColor(ranking.score),
-                            color: getScoreTextColor(ranking.score),
-                            borderColor: getScoreColor(ranking.score)
-                          }}
-                        >
-                          {scoreOptions.map(option => (
-                            <option 
-                              key={option} 
-                              value={option}
-                              style={{
-                                backgroundColor: getScoreColor(option),
-                                color: getScoreTextColor(option)
-                              }}
-                            >
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {allPhaseNumbers.map(phaseNumber => {
+        const itemsInPhase = (phases[phaseNumber] || []).sort((a, b) => a.phase_order - b.phase_order);
+        const showCounts = getShowCounts(itemsInPhase);
+        return (
+          <div key={phaseNumber} className="phase-section">
+            <h2 className="phase-title">Phase {phaseNumber}</h2>
+            <div className="table-container">
+              <table className="rankings-table">
+                <tbody>
+                  {itemsInPhase.map(item => (
+                    <tr key={`item-${item.id}`}>
+                      <td className="film-title">{getDisplayTitle(item, showCounts)}</td>
+                      <td className="film-year">{item.year}</td>
+                      <td className="score-cell">
+                        {isReadOnly ? (
+                          <span
+                            className="score-display"
+                            style={{
+                              backgroundColor: getScoreColor(item.score),
+                              color: getScoreTextColor(item.score)
+                            }}
+                          >
+                            {item.score}
+                          </span>
+                        ) : (
+                          <select
+                            value={item.score}
+                            onChange={(e) => updateScore(item, e.target.value)}
+                            className="score-select"
+                            style={{
+                              backgroundColor: getScoreColor(item.score),
+                              color: getScoreTextColor(item.score),
+                              borderColor: getScoreColor(item.score)
+                            }}
+                          >
+                            {scoreOptions.map(option => (
+                              <option
+                                key={option}
+                                value={option}
+                                style={{
+                                  backgroundColor: getScoreColor(option),
+                                  color: getScoreTextColor(option)
+                                }}
+                              >
+                                {option}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
