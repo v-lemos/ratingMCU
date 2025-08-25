@@ -70,31 +70,59 @@ const MCURankings = ({ isReadOnly = false }) => {
   };
 
   const fetchItems = async () => {
-    const { data: itemsData, error: itemsError } = await supabase
-      .from('mcu_items')
-      .select('*')
-      .order('phase, phase_order');
+    // Fetch movies/specials and shows separately, then merge with an item_type field
+    const [{ data: movies, error: moviesErr }, { data: shows, error: showsErr }] = await Promise.all([
+      supabase
+        .from('mcu_movies_specials')
+        .select('id, title, is_special, year, phase, phase_order')
+        .order('phase', { ascending: true })
+        .order('phase_order', { ascending: true }),
+      supabase
+        .from('mcu_shows')
+        .select('id, title, show_key, season_number, year, phase, phase_order')
+        .order('phase', { ascending: true })
+        .order('phase_order', { ascending: true })
+    ]);
 
-    if (itemsError) throw itemsError;
+    if (moviesErr) throw moviesErr;
+    if (showsErr) throw showsErr;
 
-    setItems(itemsData || []);
-    await fetchItemRankings(itemsData || []);
+    const moviesItems = (movies || []).map(m => ({
+      ...m,
+      item_type: m.is_special ? 'special' : 'film'
+    }));
+    const showItems = (shows || []).map(s => ({
+      ...s,
+      item_type: 'show'
+    }));
+
+    const mergedItems = [...moviesItems, ...showItems].sort((a, b) => {
+      if (a.phase !== b.phase) return a.phase - b.phase;
+      return a.phase_order - b.phase_order;
+    });
+
+    setItems(mergedItems);
+    await fetchItemRankings(mergedItems);
   };
 
   const fetchItemRankings = async (itemsData) => {
     try {
-      const { data, error } = await supabase
-        .from('mcu_item_rankings')
-        .select('*')
-        .order('item_id');
+      const [movieRes, showRes] = await Promise.all([
+        supabase.from('mcu_movie_special_rankings').select('*').order('item_id'),
+        supabase.from('mcu_show_rankings').select('*').order('item_id')
+      ]);
 
-      if (error) throw error;
+      if (movieRes.error) throw movieRes.error;
+      if (showRes.error) throw showRes.error;
 
-      const byId = new Map(data?.map(r => [r.item_id, r]) || []);
+      const movieById = new Map((movieRes.data || []).map(r => [r.item_id, r]));
+      const showById = new Map((showRes.data || []).map(r => [r.item_id, r]));
 
       const merged = itemsData.map(it => ({
         ...it,
-        score: byId.get(it.id)?.score || '5'
+        score: it.item_type === 'show'
+          ? (showById.get(it.id)?.score || '5')
+          : (movieById.get(it.id)?.score || '5')
       }));
 
       setRankings(merged);
@@ -154,8 +182,9 @@ const MCURankings = ({ isReadOnly = false }) => {
 
   const updateScore = async (item, newScore) => {
     try {
+      const table = item.item_type === 'show' ? 'mcu_show_rankings' : 'mcu_movie_special_rankings';
       const { error } = await supabase
-        .from('mcu_item_rankings')
+        .from(table)
         .upsert({
           item_id: item.id,
           score: newScore,
@@ -214,7 +243,11 @@ const MCURankings = ({ isReadOnly = false }) => {
                             {getDisplayTitle(item, showCounts)}
                           </Link>
                         </td>
-                        <td className="film-year" style={textColor ? { color: textColor } : undefined}>{item.year}</td>
+                        <td className="film-year" style={textColor ? { color: textColor } : undefined}>
+                          <Link className="title-link" to={`/all?year=${item.year}`} style={textColor ? { color: textColor } : undefined}>
+                            {item.year}
+                          </Link>
+                        </td>
                         <td className="score-cell">
                         {isReadOnly ? (
                           <span

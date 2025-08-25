@@ -15,14 +15,38 @@ const TitlePage = () => {
       try {
         setError(null);
         setLoading(true);
-        const [{ data: itemsData, error: itemErr }, { data: rankData, error: rankErr }] = await Promise.all([
-          supabase.from('mcu_items').select('*').eq('id', id).single(),
-          supabase.from('mcu_item_rankings').select('*').eq('item_id', id).maybeSingle(),
-        ]);
-        if (itemErr) throw itemErr;
-        if (rankErr) throw rankErr;
-        setItem(itemsData);
-        setScore(rankData?.score ?? '5');
+        // Try movies/specials first
+        const movieReq = supabase.from('mcu_movies_specials').select('*').eq('id', id).maybeSingle();
+        const movieRes = await movieReq;
+
+        if (movieRes.error) throw movieRes.error;
+
+        if (movieRes.data) {
+          setItem({ ...movieRes.data, item_type: movieRes.data.is_special ? 'special' : 'film' });
+          const { data: rankData, error: rankErr } = await supabase
+            .from('mcu_movie_special_rankings')
+            .select('*')
+            .eq('item_id', id)
+            .maybeSingle();
+          if (rankErr) throw rankErr;
+          setScore(rankData?.score ?? '5');
+        } else {
+          // Fallback to shows
+          const { data: showData, error: showErr } = await supabase
+            .from('mcu_shows')
+            .select('*')
+            .eq('id', id)
+            .single();
+          if (showErr) throw showErr;
+          setItem({ ...showData, item_type: 'show' });
+          const { data: rankData, error: rankErr } = await supabase
+            .from('mcu_show_rankings')
+            .select('*')
+            .eq('item_id', id)
+            .maybeSingle();
+          if (rankErr) throw rankErr;
+          setScore(rankData?.score ?? '5');
+        }
       } catch (e) {
         console.error(e);
         setError('Failed to load title');

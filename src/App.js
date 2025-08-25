@@ -8,6 +8,7 @@ import Header from './Header';
 import Footer from './Footer';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TitlePage from './TitlePage';
+import AllProjects from './AllProjects';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -86,6 +87,7 @@ function App() {
             <Routes>
               <Route path="/" element={<MCURankings isReadOnly={isReadOnly} />} />
               <Route path="/title/:id" element={<TitlePage />} />
+              <Route path="/all" element={<AllProjects isReadOnly={isReadOnly} />} />
             </Routes>
             <Footer />
           </div>

@@ -33,14 +33,46 @@ const SearchBar = () => {
     }
     timeoutRef.current = setTimeout(async () => {
       try {
-        const { data, error } = await supabase
-          .from('mcu_items')
-          .select('id, title, year, item_type, season_number, show_key')
-          .ilike('title', `%${query}%`)
-          .order('title')
-          .limit(8);
-        if (error) throw error;
-        setResults(data || []);
+        const [movieRes, showRes] = await Promise.all([
+          supabase
+            .from('mcu_movies_specials')
+            .select('id, title, is_special, year')
+            .ilike('title', `%${query}%`)
+            .order('title')
+            .limit(8),
+          supabase
+            .from('mcu_shows')
+            .select('id, title, show_key, season_number, year')
+            .ilike('title', `%${query}%`)
+            .order('title')
+            .limit(8)
+        ]);
+
+        if (movieRes.error) throw movieRes.error;
+        if (showRes.error) throw showRes.error;
+
+        const movies = (movieRes.data || []).map(m => ({
+          id: m.id,
+          title: m.title,
+          year: m.year,
+          item_type: m.is_special ? 'special' : 'film',
+          season_number: null,
+          show_key: null
+        }));
+        const shows = (showRes.data || []).map(s => ({
+          id: s.id,
+          title: s.title,
+          year: s.year,
+          item_type: 'show',
+          season_number: s.season_number,
+          show_key: s.show_key
+        }));
+
+        const merged = [...movies, ...shows]
+          .sort((a, b) => a.title.localeCompare(b.title))
+          .slice(0, 8);
+
+        setResults(merged);
         setOpen(true);
         setHighlight(-1);
       } catch (e) {

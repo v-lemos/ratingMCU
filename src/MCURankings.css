@@ -131,6 +131,16 @@
   width: 12%;
 }
 
+/* Make year links look like plain text (no blue, no underline) */
+.film-year .title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.film-year .title-link:hover {
+  text-decoration: none;
+}
+
 .score-cell {
   text-align: right; /* push controls toward table edge */
   width: 20%;
