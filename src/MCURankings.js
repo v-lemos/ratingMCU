@@ -12,17 +12,27 @@ const MCURankings = ({ isReadOnly = false }) => {
   const [error, setError] = useState(null);
   const { isDarkMode } = useTheme();
 
-  // Generate score options (0, 1-, 1, 1+, 2-, 2, 2+, ..., 9-, 9, 9+, 10)
-  const generateScoreOptions = () => {
-    const options = ['0'];
-    for (let i = 1; i <= 9; i++) {
-      options.push(`${i}-`, `${i}`, `${i}+`);
-    }
-    options.push('10', '11');
-    return options;
+  // Base score options 0..11 (modifiers handled via adjacent toggle)
+  const baseScoreOptions = Array.from({ length: 12 }, (_, i) => String(i));
+
+  const supportsModifier = (base) => {
+    const n = parseInt(base, 10);
+    return n >= 1 && n <= 9;
   };
 
-  const scoreOptions = generateScoreOptions();
+  const parseScore = (scoreStr) => {
+    // Expected forms: '0', '1', '1-', '1+', ..., '10', '11'
+    if (!scoreStr) return { base: '5', mod: '' };
+    const m = scoreStr.match(/^(\d{1,2})([+-])?$/);
+    if (!m) return { base: '5', mod: '' };
+    const base = m[1];
+    const mod = m[2] || '';
+    return { base, mod };
+  };
+
+  const composeScore = (base, mod) => {
+    return `${base}${mod || ''}`;
+  };
 
   useEffect(() => {
     fetchData();
@@ -189,15 +199,23 @@ const MCURankings = ({ isReadOnly = false }) => {
             <div className="table-container">
               <table className="rankings-table">
                 <tbody>
-                  {itemsInPhase.map(item => (
-                    <tr key={`item-${item.id}`}>
-                      <td className="film-title">
-                        <Link className="title-link" to={`/title/${item.id}`}>
-                          {getDisplayTitle(item, showCounts)}
-                        </Link>
-                      </td>
-                      <td className="film-year">{item.year}</td>
-                      <td className="score-cell">
+                  {itemsInPhase.map(item => {
+                    const { base } = parseScore(item.score);
+                    const isSolidRow = base === '0' || base === '10' || base === '11';
+                    const rowStyle = isSolidRow ? {
+                      backgroundColor: getScoreColor(item.score),
+                      color: getScoreTextColor(item.score)
+                    } : undefined;
+                    const textColor = isSolidRow ? getScoreTextColor(item.score) : undefined;
+                    return (
+                      <tr key={`item-${item.id}`} className={isSolidRow ? 'solid-score-row' : ''} style={rowStyle}>
+                        <td className="film-title" style={textColor ? { color: textColor } : undefined}>
+                          <Link className="title-link" to={`/title/${item.id}`} style={textColor ? { color: textColor } : undefined}>
+                            {getDisplayTitle(item, showCounts)}
+                          </Link>
+                        </td>
+                        <td className="film-year" style={textColor ? { color: textColor } : undefined}>{item.year}</td>
+                        <td className="score-cell">
                         {isReadOnly ? (
                           <span
                             className="score-display"
@@ -208,34 +226,74 @@ const MCURankings = ({ isReadOnly = false }) => {
                           >
                             {item.score}
                           </span>
-                        ) : (
-                          <select
-                            value={item.score}
-                            onChange={(e) => updateScore(item, e.target.value)}
-                            className="score-select"
-                            style={{
-                              backgroundColor: getScoreColor(item.score),
-                              color: getScoreTextColor(item.score),
-                              borderColor: getScoreColor(item.score)
-                            }}
-                          >
-                            {scoreOptions.map(option => (
-                              <option
-                                key={option}
-                                value={option}
+                        ) : (() => {
+                          const { base, mod } = parseScore(item.score);
+                          const hasMod = supportsModifier(base);
+                          const composed = composeScore(base, mod);
+                          const nextMod = (current) => {
+                            if (!hasMod) return '';
+                            // Cycle: none -> + -> - -> none
+                            if (current === '') return '+';
+                            if (current === '+') return '-';
+                            return '';
+                          };
+                          const onBaseChange = (e) => {
+                            const newBase = e.target.value;
+                            const newMod = supportsModifier(newBase) ? mod : '';
+                            updateScore(item, composeScore(newBase, newMod));
+                          };
+                          const onToggleMod = () => {
+                            const newMod = nextMod(mod);
+                            updateScore(item, composeScore(base, newMod));
+                          };
+                          return (
+                            <div className={`score-controls ${hasMod ? '' : 'no-modifier'}`}>
+                              <select
+                                value={base}
+                                onChange={onBaseChange}
+                                className="score-select"
                                 style={{
-                                  backgroundColor: getScoreColor(option),
-                                  color: getScoreTextColor(option)
+                                  backgroundColor: getScoreColor(composed),
+                                  color: getScoreTextColor(composed),
+                                  borderColor: getScoreColor(composed)
                                 }}
                               >
-                                {option}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                                {baseScoreOptions.map(option => (
+                                  <option
+                                    key={option}
+                                    value={option}
+                                    style={{
+                                      backgroundColor: getScoreColor(option),
+                                      color: getScoreTextColor(option)
+                                    }}
+                                  >
+                                    {option}
+                                  </option>
+                                ))}
+                              </select>
+                              {hasMod && (
+                                <button
+                                  type="button"
+                                  className={`modifier-btn ${mod === '+' ? 'mod-plus' : mod === '-' ? 'mod-minus' : 'mod-none'}`}
+                                  onClick={onToggleMod}
+                                  style={{
+                                    backgroundColor: getScoreColor(composed),
+                                    color: getScoreTextColor(composed),
+                                    borderColor: getScoreColor(composed)
+                                  }}
+                                  aria-label="+, - or none"
+                                  title="+, - or none"
+                                >
+                                  {mod}
+                                </button>
+                              )}
+                            </div>
+                          );
+                        })()}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

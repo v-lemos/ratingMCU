@@ -40,7 +40,7 @@
 
 
 .score-display {
-  font-weight: 600;
+  font-weight: 700; /* bolder score number */
   color: var(--text-primary);
   padding: 8px 12px;
   background: var(--bg-primary);
@@ -95,6 +95,16 @@
   transition: background-color 0.2s ease;
 }
 
+/* Preserve solid score row background and text on hover */
+.rankings-table tr.solid-score-row:hover {
+  background-color: inherit;
+}
+
+/* Ensure links in solid rows inherit row color */
+.solid-score-row .title-link {
+  color: inherit;
+}
+
 .film-title {
   font-weight: 500;
   color: var(--text-primary);
@@ -122,21 +132,28 @@
 }
 
 .score-cell {
-  text-align: center;
+  text-align: right; /* push controls toward table edge */
   width: 20%;
+  padding-right: 8px; /* reduce space at the far right */
 }
 
 .score-select {
-  padding: 8px 12px;
+  padding: 6px 8px;
   border: 2px solid var(--border-color);
   border-radius: 4px;
   background: var(--input-bg);
   color: var(--text-primary);
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 16px; /* larger selected score */
+  font-weight: 700; /* bold selected value */
   cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.3s ease, color 0.3s ease;
-  min-width: 70px;
+  transition: border-color 0.2s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  min-width: 56px;
+  height: 38px;
+  width: 100%;
+  max-width: 64px; /* revert to previous wider menu */
+  justify-self: start;
+  text-align: center;
+  text-align-last: center; /* center selected value in some browsers */
 }
 
 .score-select:hover {
@@ -147,6 +164,70 @@
   outline: none;
   border-color: var(--border-hover);
   box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.1);
+}
+
+/* Score controls layout (select + modifier button) */
+.score-controls {
+  display: grid;
+  grid-template-columns: auto 40px; /* wider select next to fixed-width button */
+  gap: 4px; /* tighter spacing between select and modifier */
+  align-items: center;
+  width: max-content; /* shrink to content */
+  margin-left: auto; /* align to the right inside the cell */
+}
+
+.score-controls.no-modifier {
+  grid-template-columns: auto 40px; /* preserve right-side space where modifier would be */
+}
+
+.score-controls.no-modifier .score-select {
+  grid-column: 1; /* keep select in the first column */
+  width: auto; /* do not stretch */
+  max-width: 64px; /* keep same width as normal */
+}
+
+/* Modifier button styling to match select */
+.modifier-btn {
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  height: 38px;
+  width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px; /* larger + / - */
+  font-weight: 800;
+  cursor: pointer;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  box-shadow: 0 2px 6px var(--shadow);
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  user-select: none;
+}
+
+.modifier-btn:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 3px 8px var(--shadow);
+}
+
+.modifier-btn:active {
+  transform: scale(0.96) rotate(-2deg);
+}
+
+.modifier-btn.mod-none {
+  opacity: 0.9;
+}
+
+.modifier-btn.mod-plus::after,
+.modifier-btn.mod-minus::after,
+.modifier-btn.mod-none::after {
+  animation: mod-pop 180ms ease-out;
+}
+
+@keyframes mod-pop {
+  0% { transform: scale(0.8); opacity: 0.0; }
+  60% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 /* Responsive design */
