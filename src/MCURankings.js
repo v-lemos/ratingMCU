@@ -17,7 +17,7 @@ const MCURankings = ({ isReadOnly = false }) => {
     for (let i = 1; i <= 9; i++) {
       options.push(`${i}-`, `${i}`, `${i}+`);
     }
-    options.push('10');
+    options.push('10', '11');
     return options;
   };
 
