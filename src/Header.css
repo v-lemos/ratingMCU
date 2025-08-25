@@ -25,6 +25,20 @@
   transition: color 0.3s ease;
 }
 
+.header-title-link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Ensure no underline on any interaction */
+.header-title-link:hover,
+.header-title-link:focus,
+.header-title-link:active,
+.header-title-link:focus-visible {
+  text-decoration: none;
+}
+
 /* Colored parts of the title */
 .title-rating-the {
   color: #ffcc00; /* yellow */

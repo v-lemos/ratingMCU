@@ -1,13 +1,16 @@
 import React from 'react';
 import ThemeToggle from './ThemeToggle';
 import './Header.css';
+import { Link } from 'react-router-dom';
 
 const Header = ({ user, onSignOut }) => {
   return (
     <header className="header">
       <div className="header-content">
         <h1 className="header-title">
-          <span className="title-rating-the">RATING THE</span> <span className="title-mcu">MCU</span>
+          <Link to="/" className="header-title-link">
+            <span className="title-rating-the">RATING THE</span> <span className="title-mcu">MCU</span>
+          </Link>
         </h1>
         <div className="header-actions">
           <ThemeToggle />

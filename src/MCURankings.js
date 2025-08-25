@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import { useTheme } from './ThemeContext';
 import './MCURankings.css';
+import { Link } from 'react-router-dom';
 
 const MCURankings = ({ isReadOnly = false }) => {
   const [items, setItems] = useState([]);
@@ -190,7 +191,11 @@ const MCURankings = ({ isReadOnly = false }) => {
                 <tbody>
                   {itemsInPhase.map(item => (
                     <tr key={`item-${item.id}`}>
-                      <td className="film-title">{getDisplayTitle(item, showCounts)}</td>
+                      <td className="film-title">
+                        <Link className="title-link" to={`/title/${item.id}`}>
+                          {getDisplayTitle(item, showCounts)}
+                        </Link>
+                      </td>
                       <td className="film-year">{item.year}</td>
                       <td className="score-cell">
                         {isReadOnly ? (

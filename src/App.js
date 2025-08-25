@@ -6,6 +6,8 @@ import MCURankings from './MCURankings';
 import AuthModal from './AuthModal';
 import Header from './Header';
 import Footer from './Footer';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import TitlePage from './TitlePage';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -77,20 +79,24 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className={`App ${isReadOnly ? 'guest-mode' : ''}`}>
-        <div className={`main-content ${showAuthModal ? 'blurred' : ''}`}>
-          <Header user={user} onSignOut={handleSignOut} />
-          <MCURankings isReadOnly={isReadOnly} />
-          <Footer />
+      <Router>
+        <div className={`App ${isReadOnly ? 'guest-mode' : ''}`}>
+          <div className={`main-content ${showAuthModal ? 'blurred' : ''}`}>
+            <Header user={user} onSignOut={handleSignOut} />
+            <Routes>
+              <Route path="/" element={<MCURankings isReadOnly={isReadOnly} />} />
+              <Route path="/title/:id" element={<TitlePage />} />
+            </Routes>
+            <Footer />
+          </div>
+          {showAuthModal && (
+            <AuthModal 
+              onLogin={handleLogin}
+              onGuestMode={handleGuestMode}
+            />
+          )}
         </div>
-        
-        {showAuthModal && (
-          <AuthModal 
-            onLogin={handleLogin}
-            onGuestMode={handleGuestMode}
-          />
-        )}
-      </div>
+      </Router>
     </ThemeProvider>
   );
 }

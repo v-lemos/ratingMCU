@@ -1,0 +1,53 @@
+.title-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.title-header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  border-bottom: 3px solid var(--border-hover);
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+.title-name {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.title-year {
+  font-size: 20px;
+  color: var(--text-secondary);
+}
+
+.title-score {
+  font-size: 64px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--text-primary);
+  margin: 24px 0;
+}
+
+.title-actions {
+  margin-top: 24px;
+}
+
+.back-link {
+  color: var(--accent, #3b82f6);
+  text-decoration: none;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.loading,
+.error {
+  text-align: center;
+  color: var(--text-secondary);
+}
