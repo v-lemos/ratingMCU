@@ -71,6 +71,7 @@
   border-collapse: collapse;
   background: var(--bg-secondary);
   transition: background-color 0.3s ease;
+  table-layout: fixed; /* ensure consistent column widths across all tables */
 }
 
 .rankings-table th {
@@ -98,6 +99,10 @@
   font-weight: 500;
   color: var(--text-primary);
   transition: color 0.3s ease;
+  width: 68%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .film-title .title-link {
@@ -113,10 +118,12 @@
   color: var(--text-secondary);
   font-size: 14px;
   transition: color 0.3s ease;
+  width: 12%;
 }
 
 .score-cell {
   text-align: center;
+  width: 20%;
 }
 
 .score-select {
