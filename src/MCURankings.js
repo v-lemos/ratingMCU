@@ -159,8 +159,14 @@ const MCURankings = ({ isReadOnly = false }) => {
   const getDisplayTitle = (item, showCounts) => {
     if (item.item_type === 'show' && item.season_number) {
       const count = showCounts.get(item.show_key) || 0;
-      // Only show season number if show has multiple seasons
-      return count > 1 ? `${item.title} — S${item.season_number}` : item.title;
+      if (count > 1) {
+        return (
+          <>
+            {item.title}
+            <span className="season-badge"><em>Season {item.season_number}</em></span>
+          </>
+        );
+      }
     }
     return item.title;
   };
@@ -202,6 +208,8 @@ const MCURankings = ({ isReadOnly = false }) => {
 
   const phases = groupByPhase(rankings);
   const allPhaseNumbers = Object.keys(phases).map(n => parseInt(n, 10)).sort((a, b) => a - b);
+  // Compute global show season counts across all phases
+  const globalShowCounts = getShowCounts(rankings);
 
   if (loading) {
     return <div className="loading">Loading your MCU rankings...</div>;
@@ -221,7 +229,8 @@ const MCURankings = ({ isReadOnly = false }) => {
     <div className="mcu-rankings">
       {allPhaseNumbers.map(phaseNumber => {
         const itemsInPhase = (phases[phaseNumber] || []).sort((a, b) => a.phase_order - b.phase_order);
-        const showCounts = getShowCounts(itemsInPhase);
+        // Use global counts so season shows whenever a show has multiple seasons in any phase
+        const showCounts = globalShowCounts;
         return (
           <div key={phaseNumber} className="phase-section">
             <h2 className="phase-title">Phase {phaseNumber}</h2>
