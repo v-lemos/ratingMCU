@@ -19,6 +19,9 @@
   font-weight: 800;
   color: var(--text-primary);
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 /* Season badge styling next to the title */
@@ -36,6 +39,34 @@
 .title-year {
   font-size: 20px;
   color: var(--text-secondary);
+}
+
+/* Edit button in header */
+.edit-btn {
+  margin-left: auto; /* push to the far right within the title line */
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 2px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 14px;
+  transform-origin: 10% 50%; /* pivot near the pencil tip */
+}
+
+.edit-btn:hover {
+  border-color: var(--border-hover);
+  animation: pencil-shake 0.5s ease;
+  outline: none;
+  box-shadow: none;
+}
+
+/* Remove blue focus ring/contour while keeping a subtle border change */
+.edit-btn:focus,
+.edit-btn:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border-color: var(--border-hover);
 }
 
 .title-score {
@@ -77,8 +108,109 @@
   color: var(--text-primary);
 }
 
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  width: 92%;
+  max-width: 520px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 { margin: 0; color: var(--text-primary); font-size: 20px; }
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.modal-body label {
+  display: grid;
+  gap: 6px;
+}
+
+.modal-body label span {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.modal-body input[type="text"],
+.modal-body input[type="number"] {
+  padding: 8px 10px;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.score-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; }
+.score-row > span { color: var(--text-secondary); }
+
+.modal-footer {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 2px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover { border-color: var(--border-hover); }
+
 .loading,
 .error {
   text-align: center;
   color: var(--text-secondary);
+}
+
+/* Pencil shake animation for edit button */
+@keyframes pencil-shake {
+  0% { transform: rotate(0deg) translateX(0); }
+  15% { transform: rotate(-8deg) translateX(-1px); }
+  30% { transform: rotate(6deg) translateX(1px); }
+  45% { transform: rotate(-5deg) translateX(-1px); }
+  60% { transform: rotate(4deg) translateX(1px); }
+  75% { transform: rotate(-3deg) translateX(-1px); }
+  90% { transform: rotate(2deg) translateX(0); }
+  100% { transform: rotate(0deg) translateX(0); }
 }
