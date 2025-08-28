@@ -86,7 +86,7 @@ function App() {
             <Header user={user} onSignOut={handleSignOut} />
             <Routes>
               <Route path="/" element={<MCURankings isReadOnly={isReadOnly} />} />
-              <Route path="/title/:id" element={<TitlePage />} />
+              <Route path="/title/:id" element={<TitlePage isReadOnly={isReadOnly} />} />
               <Route path="/all" element={<AllProjects isReadOnly={isReadOnly} />} />
             </Routes>
             <Footer />

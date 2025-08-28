@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import './TitlePage.css';
 
-const TitlePage = () => {
+const TitlePage = ({ isReadOnly = false }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [item, setItem] = useState(null);
@@ -128,6 +128,7 @@ const TitlePage = () => {
   };
 
   const openEditor = () => {
+    if (isReadOnly) return; // Prevent guests from opening editor
     if (!item) return;
     setFormTitle(item.title || '');
     setFormYear(String(item.year || ''));
@@ -140,6 +141,7 @@ const TitlePage = () => {
   const closeEditor = () => setIsEditing(false);
 
   const saveEdits = async () => {
+    if (isReadOnly) return; // Extra guard for safety
     try {
       setLoading(true);
       // Basic validation
@@ -212,7 +214,9 @@ const TitlePage = () => {
           ) : (
             item.title
           )}
-          <button type="button" className="edit-btn" onClick={openEditor}>✏️</button>
+          {!isReadOnly && (
+            <button type="button" className="edit-btn" onClick={openEditor}>✏️</button>
+          )}
         </h1>
         <div className="title-year">{item.year}</div>
         {item.item_type === 'show' && seasons.length > 1 && (
@@ -234,7 +238,7 @@ const TitlePage = () => {
       <div className="title-score">{score}</div>
       
 
-      {isEditing && (
+      {isEditing && !isReadOnly && (
         <div className="modal-overlay" role="dialog" aria-modal="true">
           <div className="modal">
             <div className="modal-header">
