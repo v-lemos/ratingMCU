@@ -48,6 +48,8 @@
 
 .title-mcu {
   color: #b22222; /* dark red */
+  font-weight: 800; /* make MCU bold */
+  font-size: 1.05em; /* make MCU larger */
 }
 
 /* Actions container (theme switch + sign out) */
